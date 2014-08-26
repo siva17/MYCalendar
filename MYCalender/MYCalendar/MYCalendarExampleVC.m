@@ -64,6 +64,9 @@
                                    months2014, @"2014",
                                    nil];
     [calendarView setDisabledDates:disabledDates];
+    CGSize size = [calendarView getCalendarViewSize];
+    CGRect frame = calendarView.frame;
+    frame.size.height = size.height;
     [self.view addSubview: self.calendarView];
 }
 

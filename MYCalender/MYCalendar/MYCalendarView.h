@@ -56,4 +56,5 @@
 @property(nonatomic,retain) NSDictionary	*dayLabelDisabledTextAttributes;
 
 -(id)initWithFrame:(CGRect)frame delegate:(id)dlg;
+-(CGSize)getCalendarViewSize;
 @end

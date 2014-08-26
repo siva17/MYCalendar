@@ -43,6 +43,7 @@
 
 
 static const CGFloat kGridMargin = 4;
+static const CGFloat kCalendarMargin = 10;
 static const CGFloat kDefaultMonthBarButtonWidth = 60;
 
 @interface MYCalendarView()
@@ -51,6 +52,8 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
 @property(nonatomic,retain) NSCalendar		*calendar;
 @property(nonatomic,readonly) NSUInteger	displayedYear;
 @property(nonatomic,readonly) NSUInteger	displayedMonth;
+@property(nonatomic,assign) CGFloat			dayCellWidth;
+@property(nonatomic,assign) CGFloat			calendarViewHeight;
 
 // UI
 @property(nonatomic,retain) UIView			*monthBar;
@@ -72,6 +75,8 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
 @synthesize monthBarHeight;
 @synthesize weekBarHeight;
 @synthesize dayCellHeight;
+@synthesize dayCellWidth;
+@synthesize calendarViewHeight;
 
 @synthesize monthBarBgColorRef;
 @synthesize monthLabelTextAttributes;
@@ -237,6 +242,10 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
     [self setDefaults];
 }
 
+-(CGSize)getCalendarViewSize {
+    return CGSizeMake(320, calendarViewHeight);
+}
+
 
 #pragma mark - Private APIs
 
@@ -278,11 +287,12 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
        NSBackgroundColorAttributeName	: THEME_COLOR
     };
 
-    self.selectedDate	= nil;
-    self.displayedDate	= [NSDate date];
+	self.dayCellWidth	= ((self.bounds.size.width - kGridMargin * 2 - kCalendarMargin*2) / 7.0);
     self.monthBarHeight	= 48;
     self.weekBarHeight	= 40;
     self.dayCellHeight	= 0; // 0 means auto
+    self.selectedDate	= nil;
+    self.displayedDate	= [NSDate date];
 }
 
 -(void)updateSelectedDate {
@@ -324,22 +334,17 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
 }
 
 -(void)setMonthBarHeight:(CGFloat)height {
-    if (monthBarHeight != height) {
-		monthBarHeight = height;
-		[self setNeedsLayout];
-    }
+    calendarViewHeight = calendarViewHeight + height - monthBarHeight;
+    monthBarHeight = height;
 }
 -(void)setWeekBarHeight:(CGFloat)height {
-    if (weekBarHeight != height) {
-        weekBarHeight = height;
-        [self setNeedsLayout];
-    }
+    calendarViewHeight = calendarViewHeight + height - weekBarHeight;
+    weekBarHeight = height;
 }
 -(void)setDayCellHeight:(CGFloat)height {
-    if(height != dayCellHeight) {
-        dayCellHeight = height;
-        [self setNeedsDisplay];
-    }
+    CGFloat tempHeight = ((height <= 0)?(dayCellWidth):(height));
+    calendarViewHeight = calendarViewHeight + (tempHeight - dayCellHeight) * 6;
+    dayCellHeight = tempHeight;
 }
 
 -(void)touchedCellView:(MYCalendarCell *)cellView {
@@ -386,7 +391,7 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
     CGFloat top = 0;
 
     if(self.monthBarHeight) {
-        self.monthBar.frame = CGRectMake(0, top, self.bounds.size.width, self.monthBarHeight);
+        self.monthBar.frame = CGRectMake(0, 0, self.bounds.size.width, self.monthBarHeight);
         self.monthLabel.frame = CGRectMake(0, top, self.bounds.size.width, self.monthBar.bounds.size.height);
         self.monthForwardButton.frame = CGRectMake(self.monthBar.bounds.size.width - kDefaultMonthBarButtonWidth, top, kDefaultMonthBarButtonWidth, self.monthBar.bounds.size.height);
         self.monthBackButton.frame = CGRectMake(0, top, kDefaultMonthBarButtonWidth, self.monthBar.bounds.size.height);
@@ -396,7 +401,7 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
     }
 
     if(self.weekBarHeight) {
-        self.weekdayBar.frame = CGRectMake(0, top, self.bounds.size.width, self.weekBarHeight);
+        self.weekdayBar.frame = CGRectMake(kCalendarMargin, top, self.bounds.size.width - 2*kCalendarMargin, self.weekBarHeight);
         CGRect contentRect = CGRectInset(self.weekdayBar.bounds, kGridMargin, 0);
         for (NSUInteger i = 0; i < [self.weekdayNameLabels count]; ++i) {
             UILabel *label = [self.weekdayNameLabels objectAtIndex:i];
@@ -429,15 +434,14 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
     // Calculate range
     NSRange range = [self.calendar rangeOfUnit:NSDayCalendarUnit inUnit:NSMonthCalendarUnit forDate:self.displayedDate];
 
-    self.gridView.frame = CGRectMake(kGridMargin, top, self.bounds.size.width - kGridMargin * 2, self.bounds.size.height - top);
-    CGFloat cellWidth = (self.bounds.size.width - kGridMargin * 2) / 7.0;
-    CGFloat cellHeight = ((dayCellHeight <= 0)?(cellWidth):(dayCellHeight));
+    self.gridView.frame = CGRectMake(kGridMargin+kCalendarMargin, top, self.bounds.size.width - kGridMargin * 2 - kCalendarMargin * 2, calendarViewHeight - top);
     for (NSUInteger i = 0; i < [self.dayCells count]; ++i) {
         MYCalendarCell *cellView = [self.dayCells objectAtIndex:i];
         cellView.enabled = enabledDays[i];
-        cellView.frame = CGRectMake(cellWidth * ((shift + i) % 7), cellHeight * ((shift + i) / 7), cellWidth, cellHeight);
+        cellView.frame = CGRectMake(dayCellWidth * ((shift + i) % 7), dayCellHeight * ((shift + i) / 7), dayCellWidth, dayCellHeight);
         cellView.hidden = i >= range.length;
     }
+    [self setFrame:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height)];
 }
 
 @end
