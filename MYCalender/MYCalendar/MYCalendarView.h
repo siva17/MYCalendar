@@ -47,6 +47,7 @@
 @property(nonatomic,assign) CGFloat			monthBarHeight;
 @property(nonatomic,assign) CGFloat			weekBarHeight;
 @property(nonatomic,assign) CGFloat			dayCellHeight;
+@property(nonatomic,assign) BOOL			disablePastDates;
 
 @property(nonatomic,assign) CGGradientRef 	monthBarBgColorRef;
 @property(nonatomic,retain) NSDictionary	*monthLabelTextAttributes;

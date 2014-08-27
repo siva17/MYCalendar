@@ -34,12 +34,16 @@
 
 #import "MYCalendarView.h"
 
+#define MYCALENDAR_MONTH_BAR_BG_COLOR	[UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1]
+#define MYCALENDAR_MAX_YEARS			(-1*((4*12) - 1))
+
 #import <QuartzCore/QuartzCore.h>
 
 #import "MYCalendarCell.h"
 #import "UIColor+MYCalendar.h"
 #import "UILabel+MYCalendar.h"
 #import "UIButton+MYCalendar.h"
+#import "NSDate+MYCalendar.h"
 
 
 static const CGFloat kGridMargin = 4;
@@ -77,6 +81,7 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
 @synthesize dayCellHeight;
 @synthesize dayCellWidth;
 @synthesize calendarViewHeight;
+@synthesize disablePastDates;
 
 @synthesize monthBarBgColorRef;
 @synthesize monthLabelTextAttributes;
@@ -97,7 +102,6 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
 @synthesize gridView			= _gridView;
 @synthesize dayCells			= _dayCells;
 @synthesize dateFormatter		= _dateFormatter;
-
 
 #pragma mark - Lazy instantiation.
 
@@ -128,6 +132,7 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
         [_monthBackButton setTitle: @"<" forState:UIControlStateNormal];
         [_monthBackButton.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:20]];
        	[_monthBackButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+       	[_monthBackButton setTitleColor:MYCALENDAR_MONTH_BAR_BG_COLOR forState:UIControlStateDisabled];
         [_monthBackButton addTarget: self action: @selector(monthBack) forControlEvents: UIControlEventTouchUpInside];
         [self.monthBar addSubview: _monthBackButton];
     }
@@ -140,6 +145,7 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
         [_monthForwardButton setTitle: @">" forState:UIControlStateNormal];
         [_monthForwardButton.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:20]];
        	[_monthForwardButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+       	[_monthForwardButton setTitleColor:MYCALENDAR_MONTH_BAR_BG_COLOR forState:UIControlStateDisabled];
         [_monthForwardButton addTarget: self action: @selector(monthForward) forControlEvents: UIControlEventTouchUpInside];
         [self.monthBar addSubview: _monthForwardButton];
     }
@@ -200,7 +206,6 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
             [cell mySetTitleTextAttributes:dayLabelDisabledTextAttributes forState:UIControlStateDisabled];
             [cell addTarget: self action: @selector(touchedCellView:) forControlEvents: UIControlEventTouchUpInside];
             
-            
             [cells addObject:cell];
             [self.gridView addSubview: cell];
         }
@@ -251,13 +256,13 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
 
 -(void)setDefaults {
 
-    // TODO: Merge default text attributes when given custom ones!
+	disablePastDates = true;
     disabledDates = nil;
     
     monthBarBgColorRef = CGGradientCreateWithColors(NULL,
         (CFArrayRef)@[
-            (id)[UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1].CGColor,
-            (id)[UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1].CGColor], NULL);
+            (id)MYCALENDAR_MONTH_BAR_BG_COLOR.CGColor,
+            (id)MYCALENDAR_MONTH_BAR_BG_COLOR.CGColor], NULL);
 
     monthLabelTextAttributes = @{
         NSForegroundColorAttributeName	: [UIColor darkGrayColor],
@@ -307,7 +312,7 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
     if (![selDate isEqual:selectedDate]) {
         selectedDate = selDate;
         [self updateSelectedDate];
-        if((self.delegate) && ([self.delegate respondsToSelector:@selector(calendarView:didSelectDate:)])) {
+        if((selDate) && (self.delegate) && ([self.delegate respondsToSelector:@selector(calendarView:didSelectDate:)])) {
             [self.delegate calendarView: self didSelectDate: selectedDate];
         }
     }
@@ -388,6 +393,12 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
     self.monthBar.backgroundColor = [UIColor myColorWithGradient:monthBarBgColorRef size:CGSizeMake(1, monthBarHeight)];
     [self.monthLabel mySetTextAttributes:self.monthLabelTextAttributes];
 
+    if((disablePastDates) && (displayedDate)) {
+        int diffMonths = [displayedDate diffBetween:[NSDate date] unit:NSMonthCalendarUnit];
+        [self.monthBackButton setEnabled:(diffMonths < 0)];
+        [self.monthForwardButton setEnabled:((diffMonths <= 0) && (diffMonths > MYCALENDAR_MAX_YEARS))];
+    }
+    
     CGFloat top = 0;
 
     if(self.monthBarHeight) {
@@ -418,14 +429,21 @@ static const CGFloat kDefaultMonthBarButtonWidth = 60;
     if (shift < 0) shift = 7 + shift;
 
     BOOL enabledDays[31];
-    memset(enabledDays, true, sizeof(BOOL)*31);
+    if(disablePastDates) {
+        NSDate *todayDate = [NSDate date];
+        for (int i=0; i < 31; i++) {
+            enabledDays[i] = ([todayDate diffBetween:[displayedDate getDateWithDay:(i+1)] unit:NSDayCalendarUnit] > 0);
+        }
+    } else {
+        memset(enabledDays, true, sizeof(BOOL)*31);
+    }
     if(disabledDates) {
         NSDictionary *disabledYear = [disabledDates objectForKey:[NSString stringWithFormat:@"%d",self.displayedYear]];
         if(disabledYear) {
             NSDictionary *disabledMonth = [disabledYear objectForKey:[NSString stringWithFormat:@"%d",self.displayedMonth]];
             if(disabledMonth) {
                 for (int i=0; i < 31; i++) {
-                    enabledDays[i] = (([disabledMonth objectForKey:[NSString stringWithFormat:@"%d",i+1]])?(false):(true));
+                    enabledDays[i] = (([disabledMonth objectForKey:[NSString stringWithFormat:@"%d",i+1]])?(false):(enabledDays[i]));
                 }
             }
         }

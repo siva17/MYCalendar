@@ -26,6 +26,7 @@
 		843874BD19AAD20D00471587 /* UIButton+MYCalendar.m in Sources */ = {isa = PBXBuildFile; fileRef = 843874B519AAD20D00471587 /* UIButton+MYCalendar.m */; };
 		843874BE19AAD20D00471587 /* UIColor+MYCalendar.m in Sources */ = {isa = PBXBuildFile; fileRef = 843874B719AAD20D00471587 /* UIColor+MYCalendar.m */; };
 		843874BF19AAD20D00471587 /* UILabel+MYCalendar.m in Sources */ = {isa = PBXBuildFile; fileRef = 843874B919AAD20D00471587 /* UILabel+MYCalendar.m */; };
+		84D1CF2619AE21E9007E1B6D /* NSDate+MYCalendar.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D1CF2519AE21E9007E1B6D /* NSDate+MYCalendar.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +69,8 @@
 		843874B719AAD20D00471587 /* UIColor+MYCalendar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+MYCalendar.m"; sourceTree = "<group>"; };
 		843874B819AAD20D00471587 /* UILabel+MYCalendar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+MYCalendar.h"; sourceTree = "<group>"; };
 		843874B919AAD20D00471587 /* UILabel+MYCalendar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UILabel+MYCalendar.m"; sourceTree = "<group>"; };
+		84D1CF2419AE21E9007E1B6D /* NSDate+MYCalendar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+MYCalendar.h"; sourceTree = "<group>"; };
+		84D1CF2519AE21E9007E1B6D /* NSDate+MYCalendar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+MYCalendar.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -175,6 +178,8 @@
 				843874B119AAD20D00471587 /* MYCalendarExampleVC.m */,
 				843874B219AAD20D00471587 /* MYCalendarView.h */,
 				843874B319AAD20D00471587 /* MYCalendarView.m */,
+				84D1CF2419AE21E9007E1B6D /* NSDate+MYCalendar.h */,
+				84D1CF2519AE21E9007E1B6D /* NSDate+MYCalendar.m */,
 				843874B419AAD20D00471587 /* UIButton+MYCalendar.h */,
 				843874B519AAD20D00471587 /* UIButton+MYCalendar.m */,
 				843874B619AAD20D00471587 /* UIColor+MYCalendar.h */,
@@ -289,6 +294,7 @@
 				843874BB19AAD20D00471587 /* MYCalendarExampleVC.m in Sources */,
 				843874BA19AAD20D00471587 /* MYCalendarCell.m in Sources */,
 				8438747019AA8CF500471587 /* main.m in Sources */,
+				84D1CF2619AE21E9007E1B6D /* NSDate+MYCalendar.m in Sources */,
 				843874BC19AAD20D00471587 /* MYCalendarView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -494,6 +500,7 @@
 				8438749419AA8CF600471587 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8438749519AA8CF600471587 /* Build configuration list for PBXNativeTarget "MYCalenderTests" */ = {
 			isa = XCConfigurationList;
@@ -502,6 +509,7 @@
 				8438749719AA8CF600471587 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

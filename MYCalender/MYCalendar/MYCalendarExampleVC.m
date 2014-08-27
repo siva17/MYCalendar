@@ -47,7 +47,7 @@
                                      @"1",@"12",
                                      @"1",@"18",
                                      @"1",@"21",
-                                     @"1",@"26",
+                                     @"1",@"30",
                                      nil];
     NSDictionary *sepDisableDates = [[NSDictionary alloc]initWithObjectsAndKeys:
                                      @"1",@"12",
@@ -64,6 +64,7 @@
                                    months2014, @"2014",
                                    nil];
     [calendarView setDisabledDates:disabledDates];
+    [calendarView setDisablePastDates:false];
     CGSize size = [calendarView getCalendarViewSize];
     CGRect frame = calendarView.frame;
     frame.size.height = size.height;
